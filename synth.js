@@ -1,4 +1,4 @@
-import Voice from "./effect.js";
+import Voice from "./Voice.js";
 
 /**
  * @constant {AudioContext} mySynthCtx
@@ -39,27 +39,47 @@ const mtof = function (midi) {
  */
 const startNote = function (note) {
   if (!activeVoices[note]) {
-    activeVoices[note] = mtof(note);
+    let someVoice = new Voice(
+      mySynthCtx,
+      mtof(note),
+      Math.random(),
+      masterGain
+    );
+    activeVoices[note] = someVoice;
+    activeVoices[note].start(); //someVoice.start()
     console.log(activeVoices);
   }
 };
 
-/**
+/***
  * @function stopNote
  * @description Stops a currently playing note and removes it from activeVoices.
  * @param {number} note - The MIDI note number.
  */
 const stopNote = function (note) {
   if (activeVoices[note]) {
+    activeVoices[note].stop();
     delete activeVoices[note];
     console.log(activeVoices);
   }
 };
 
-/**
- * @constant {Object} noteMap
- * @description Maps keyboard keys to MIDI note numbers.
- */
+const midiParser = function (midiEvent) {
+  if (midiEvent.data(0) == 144) {
+    console.log("note on");
+  }
+};
+
+const onMIDIsuccess = function (midiInfo) {
+  for (let myMidiIn of midiInfo.inputs.values()) {
+    myMidiIn.onMidiMessage = midiParser;
+  }
+};
+
+// /**
+//  * @constant {Object} noteMap
+//  * @description Maps keyboard keys to MIDI note numbers.
+//  */
 const noteMap = {
   a: 60, // C4
   w: 61, // C#4 / Db4
@@ -99,3 +119,5 @@ document.addEventListener("keyup", (e) => {
     stopNote(noteMap[e.key]);
   }
 });
+
+// let someNewSpecialVoice = new Voice(mySynthCtx, 440, masterGain);

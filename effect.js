@@ -13,7 +13,7 @@ export default class Voice {
     this.output = out;
 
     // ADSR envelope parameters (in seconds)
-    this.attack = 0.02;
+    this.attack = 0.01;
     this.decay = 0.01;
     this.sustain = 0.5;
     this.release = 0.5;
@@ -32,18 +32,18 @@ export default class Voice {
     this.osc.onended = this.dispose.bind(this); // Auto-cleanup on stop
 
     // Create second oscillator (sawtooth at 2x frequency)
-    this.osc2 = this.context.createOscillator();
-    this.osc2.frequency.setValueAtTime(this.frequency * 2, now);
-    this.osc2.type = "sawtooth";
-    this.osc2scale = this.context.createGain();
-    this.osc2scale.gain.value = 0.5;
+    // this.osc2 = this.context.createOscillator();
+    // this.osc2.frequency.setValueAtTime(this.frequency * 2, now);
+    // this.osc2.type = "sawtooth";
+    // this.osc2scale = this.context.createGain();
+    // this.osc2scale.gain.value = 0.5;
 
     // Create third oscillator (sawtooth at 3x frequency)
-    this.osc3 = this.context.createOscillator();
-    this.osc3.frequency.setValueAtTime(this.frequency * 3, now);
-    this.osc3.type = "sawtooth";
-    this.osc3scale = this.context.createGain();
-    this.osc3scale.gain.value = 0.5;
+    // this.osc3 = this.context.createOscillator();
+    // this.osc3.frequency.setValueAtTime(this.frequency * 3, now);
+    // this.osc3.type = "sawtooth";
+    // this.osc3scale = this.context.createGain();
+    // this.osc3scale.gain.value = 0.5;
 
     // Create gain node for amplitude envelope
     this.ampEnv = this.context.createGain();
