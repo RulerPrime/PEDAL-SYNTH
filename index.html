@@ -2,13 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pedal Synth</title>
     <script src="synth.js" type="module"></script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <input id="gainSlider" type="range" min="0" max="1" step=".01" />
+    <p>Master Gain</p>
+    <input
+      id="masterFader"
+      type="range"
+      min="-70.0"
+      max="6.0"
+      step="0.1"
+      value="-12.0" />
+    <label for="masterFader" id="fadeLabel">-12.0 dBFS</label>
     <!-- Button -->
   </body>
 </html>
