@@ -2,7 +2,7 @@ const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const masterGain = audioContext.createGain();
 masterGain.connect(audioContext.destination);
 
-const waveformSelect = "sine"; // static for now, you can add dropdown for control
+const waveformSelect = document.getElementById("waveformSelect");
 const activeVoices = {};
 
 const noteMap = {
@@ -79,24 +79,26 @@ for (const [key, midi] of Object.entries(noteMap)) {
 }
 
 document.addEventListener("keydown", (event) => {
+  if (event.target.tagName.toLowerCase() === "select") return; // avoid interference with dropdown
+
   const key = event.key;
   if (!noteMap[key] || activeVoices[key]) return;
 
   const midiNote = noteMap[key];
   const frequency = midiToFreq(midiNote);
+  const type = waveformSelect.value;
 
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
 
-  oscillator.type = waveformSelect;
+  oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
   oscillator.connect(gainNode);
   gainNode.connect(masterGain);
 
-  // ADSR Envelope
   const now = audioContext.currentTime;
   const attack = 0.05;
-  const decay = 0.2;
+  const decay = 0.1;
   const sustain = 0.7;
   gainNode.gain.cancelScheduledValues(now);
   gainNode.gain.setValueAtTime(0, now);
@@ -104,7 +106,6 @@ document.addEventListener("keydown", (event) => {
   gainNode.gain.linearRampToValueAtTime(sustain, now + attack + decay);
 
   oscillator.start();
-
   activeVoices[key] = { oscillator, gainNode };
 
   console.log(
