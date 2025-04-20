@@ -70,8 +70,9 @@ function midiToName(midi) {
 }
 
 for (const [key, midi] of Object.entries(noteMap)) {
+  const isSharp = midiToName(midi).includes("#");
   const div = document.createElement("div");
-  div.className = "key";
+  div.className = `key ${isSharp ? "black" : "white"}`;
   div.dataset.key = key;
   div.dataset.midi = midi;
   div.textContent = key;
@@ -79,7 +80,7 @@ for (const [key, midi] of Object.entries(noteMap)) {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (event.target.tagName.toLowerCase() === "select") return; // avoid interference with dropdown
+  if (event.target.tagName.toLowerCase() === "select") return;
 
   const key = event.key;
   if (!noteMap[key] || activeVoices[key]) return;
@@ -89,24 +90,26 @@ document.addEventListener("keydown", (event) => {
   const type = waveformSelect.value;
 
   const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
+  const ampEnv = audioContext.createGain();
 
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-  oscillator.connect(gainNode);
-  gainNode.connect(masterGain);
+  oscillator.connect(ampEnv);
+  ampEnv.connect(masterGain);
 
   const now = audioContext.currentTime;
-  const attack = 0.05;
-  const decay = 0.1;
-  const sustain = 0.7;
-  gainNode.gain.cancelScheduledValues(now);
-  gainNode.gain.setValueAtTime(0, now);
-  gainNode.gain.linearRampToValueAtTime(1, now + attack);
-  gainNode.gain.linearRampToValueAtTime(sustain, now + attack + decay);
+  const attack = 0.02;
+  const decay = 0.05;
+  const sustain = 0.6;
+  const release = 0.2;
+
+  ampEnv.gain.cancelScheduledValues(now);
+  ampEnv.gain.setValueAtTime(0.0001, now);
+  ampEnv.gain.exponentialRampToValueAtTime(1.0, now + attack);
+  ampEnv.gain.exponentialRampToValueAtTime(sustain, now + attack + decay);
 
   oscillator.start();
-  activeVoices[key] = { oscillator, gainNode };
+  activeVoices[key] = { oscillator, ampEnv, release };
 
   console.log(
     `Key: ${key} | MIDI: ${midiNote} | Freq: ${frequency.toFixed(2)} Hz`
@@ -123,13 +126,14 @@ document.addEventListener("keyup", (event) => {
   const key = event.key;
   const voice = activeVoices[key];
   if (voice) {
-    const { oscillator, gainNode } = voice;
+    const { oscillator, ampEnv, release } = voice;
     const now = audioContext.currentTime;
-    const release = 0.3;
-    gainNode.gain.cancelScheduledValues(now);
-    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-    gainNode.gain.linearRampToValueAtTime(0, now + release);
-    oscillator.stop(now + release);
+
+    ampEnv.gain.cancelScheduledValues(now);
+    ampEnv.gain.setValueAtTime(ampEnv.gain.value, now);
+    ampEnv.gain.exponentialRampToValueAtTime(0.0001, now + release);
+
+    oscillator.stop(now + release + 0.05);
     oscillator.disconnect();
     delete activeVoices[key];
   }

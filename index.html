@@ -3,36 +3,80 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sine Wave Keyboard Synth</title>
+    <title>Synth Keyboard</title>
     <script src="synth.js" type="module"></script>
     <link rel="stylesheet" href="style.css" />
     <style>
-      .keyboard {
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
         display: flex;
-        flex-wrap: wrap;
-        max-width: 600px;
-        margin-top: 20px;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        justify-content: flex-start;
+        position: relative;
       }
-      .key {
-        width: 40px;
-        height: 150px;
-        border: 1px solid black;
-        margin: 1px;
+
+      #controls {
+        margin-bottom: 220px; /* space for keyboard */
         text-align: center;
-        line-height: 150px;
-        font-size: 14px;
-        user-select: none;
-        background-color: white;
-        transition: background-color 0.1s;
       }
-      .key.active {
-        background-color: #4caf50;
+
+      #noteDisplay {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      #keyboard {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 420px;
+        height: 200px;
+        border: 2px solid #333;
+        background: #ccc;
+        z-index: 10;
+      }
+
+      .key {
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+        font-size: 12px;
+        font-family: sans-serif;
+        border: 1px solid black;
+        position: relative;
+        user-select: none;
+      }
+
+      .white {
+        width: 40px;
+        height: 200px;
+        background: white;
+        z-index: 1;
+      }
+
+      .black {
+        width: 25px;
+        height: 120px;
+        background: black;
         color: white;
+        position: absolute;
+        top: 0;
+        z-index: 2;
+        margin-left: -12.5px;
+      }
+
+      .key.active {
+        background-color: #4fc3f7 !important;
       }
     </style>
   </head>
   <body>
-    <div>
+    <div id="controls">
       <p>Master Gain</p>
       <input
         id="masterFader"
@@ -42,25 +86,22 @@
         step="0.1"
         value="-12.0" />
       <label for="masterFader" id="fadeLabel">-12.0 dBFS</label>
-    </div>
 
-    <div>
-      <p>Waveform</p>
+      <p>Waveform Selector</p>
       <select id="waveformSelect">
         <option value="sine">Sine</option>
         <option value="square">Square</option>
         <option value="triangle">Triangle</option>
         <option value="sawtooth">Sawtooth</option>
       </select>
-    </div>
-    <div id="noteDisplay">Currently Playing: None</div>
 
-    <div id="keyboard" class="keyboard">
-      <!-- Keys will be added dynamically -->
+      <p>
+        Use your keyboard to play notes! (a, w, s, e, d, f, t, g, y, h, u, j,
+        k...)
+      </p>
+      <p id="noteDisplay">Currently Playing: None</p>
     </div>
-    <p>
-      Use your keyboard to play notes! (a, w, s, e, d, f, t, g, y, h, u, j,
-      k...)
-    </p>
+
+    <div id="keyboard"></div>
   </body>
 </html>
