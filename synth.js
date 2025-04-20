@@ -4,6 +4,8 @@ import {
   setFeedbackGain,
   initOverdrive,
   setOverdriveGain,
+  setReverbWetDry,
+  setReverbSize,
 } from "./effect.js";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -46,6 +48,14 @@ const keyboardContainer = document.getElementById("keyboard");
 const { delay, feedbackGain } = initDelay(audioContext);
 // Initialize overdrive
 const overdrive = initOverdrive(audioContext);
+// Initialize reverb
+import { initReverb } from "./effect.js";
+const { convolver, wetGain, dryGain } = initReverb(audioContext);
+
+// Connect reverb to master
+wetGain.connect(masterGain);
+dryGain.connect(masterGain);
+
 //connect effects
 masterGain.connect(delay); // Connect master gain to delay
 
@@ -112,6 +122,24 @@ feedbackSlider.addEventListener("input", (event) => {
   feedbackLabel.textContent = `${feedbackValue.toFixed(2)}`; // Update the label with the current value
 });
 
+// Handle Reverb Size
+const reverbSizeSlider = document.getElementById("reverbSizeSlider");
+const reverbSizeLabel = document.getElementById("reverbSizeLabel");
+reverbSizeSlider.addEventListener("input", (event) => {
+  const size = parseFloat(event.target.value);
+  setReverbSize(convolver, size, audioContext);
+  reverbSizeLabel.textContent = `${size.toFixed(2)}s`;
+});
+
+// Handle Wet/Dry Mix
+const reverbMixSlider = document.getElementById("reverbMixSlider");
+const reverbMixLabel = document.getElementById("reverbMixLabel");
+reverbMixSlider.addEventListener("input", (event) => {
+  const mix = parseFloat(event.target.value);
+  setReverbWetDry(wetGain, dryGain, mix);
+  reverbMixLabel.textContent = `${(mix * 100).toFixed(0)}% Wet`;
+});
+
 // Handle Overdrive Gain Slider
 const overdriveGainSlider = document.getElementById("overdriveGain");
 const overdriveGainLabel = document.getElementById("overdriveGainLabel");
@@ -120,7 +148,6 @@ overdriveGainSlider.addEventListener("input", (event) => {
   setOverdriveGain(overdrive, gainValue);
   overdriveGainLabel.textContent = `${gainValue}`; // Update the label with the current value
 });
-
 document.addEventListener("keydown", (event) => {
   if (event.target.tagName.toLowerCase() === "select") return;
 
@@ -139,13 +166,16 @@ document.addEventListener("keydown", (event) => {
   oscillator.connect(ampEnv);
   ampEnv.connect(overdrive); // Connect to overdrive before going to feedback gain
   overdrive.connect(feedbackGain); // Connect overdrive to feedback gain
+  feedbackGain.connect(dryGain); // DRY signal path
+  feedbackGain.connect(convolver); // WET signal path
+  convolver.connect(wetGain); // WET to output
   feedbackGain.connect(masterGain); // Connect feedback gain to master gain
 
   const now = audioContext.currentTime;
   const attack = 0.02;
   const decay = 0.05;
   const sustain = 0.6;
-  const release = 0.2;
+  const release = 0.45;
 
   ampEnv.gain.cancelScheduledValues(now);
   ampEnv.gain.setValueAtTime(0.0001, now);
