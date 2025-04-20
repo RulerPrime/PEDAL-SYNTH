@@ -1,4 +1,10 @@
-import { initDelay, setDelayTime, setFeedbackGain } from "./effect.js";
+import {
+  initDelay,
+  setDelayTime,
+  setFeedbackGain,
+  initOverdrive,
+  setOverdriveGain,
+} from "./effect.js";
 
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const masterGain = audioContext.createGain();
@@ -38,6 +44,9 @@ const keyboardContainer = document.getElementById("keyboard");
 
 // Initialize delay effect
 const { delay, feedbackGain } = initDelay(audioContext);
+// Initialize overdrive
+const overdrive = initOverdrive(audioContext);
+//connect effects
 masterGain.connect(delay); // Connect master gain to delay
 
 masterGain.gain.setValueAtTime(
@@ -103,6 +112,15 @@ feedbackSlider.addEventListener("input", (event) => {
   feedbackLabel.textContent = `${feedbackValue.toFixed(2)}`; // Update the label with the current value
 });
 
+// Handle Overdrive Gain Slider
+const overdriveGainSlider = document.getElementById("overdriveGain");
+const overdriveGainLabel = document.getElementById("overdriveGainLabel");
+overdriveGainSlider.addEventListener("input", (event) => {
+  const gainValue = parseFloat(event.target.value);
+  setOverdriveGain(overdrive, gainValue);
+  overdriveGainLabel.textContent = `${gainValue}`; // Update the label with the current value
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.target.tagName.toLowerCase() === "select") return;
 
@@ -119,7 +137,8 @@ document.addEventListener("keydown", (event) => {
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
   oscillator.connect(ampEnv);
-  ampEnv.connect(feedbackGain); // Connect to feedback gain before going to delay
+  ampEnv.connect(overdrive); // Connect to overdrive before going to feedback gain
+  overdrive.connect(feedbackGain); // Connect overdrive to feedback gain
   feedbackGain.connect(masterGain); // Connect feedback gain to master gain
 
   const now = audioContext.currentTime;

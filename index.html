@@ -7,6 +7,20 @@
     <script src="synth.js" type="module"></script>
     <link rel="stylesheet" href="style.css" />
     <style>
+      #effectsPanel {
+        position: fixed;
+        left: 20px;
+        top: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 12px;
+        border-radius: 8px;
+        z-index: 100;
+        font-family: sans-serif;
+        font-size: 14px;
+        color: #fff;
+        width: 180px;
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -101,25 +115,36 @@
       </p>
       <p id="noteDisplay">Currently Playing: None</p>
     </div>
-    <p>Delay Time</p>
-    <input
-      id="delayTimeSlider"
-      type="range"
-      min="0"
-      max="2"
-      step="0.01"
-      value="0.5" />
-    <label for="delayTimeSlider" id="delayTimeLabel">0.5s</label>
+    <div id="effectsPanel">
+      <p>Overdrive Gain</p>
+      <input
+        id="overdriveGain"
+        type="range"
+        min="0"
+        max="1000"
+        step="1"
+        value="400" />
+      <label for="overdriveGain" id="overdriveGainLabel">400</label>
+      <p>Delay Time</p>
+      <input
+        id="delayTimeSlider"
+        type="range"
+        min="0"
+        max="2"
+        step="0.01"
+        value="0.5" />
+      <label for="delayTimeSlider" id="delayTimeLabel">0.5s</label>
 
-    <p>Feedback Gain</p>
-    <input
-      id="feedbackSlider"
-      type="range"
-      min="0"
-      max="1"
-      step="0.01"
-      value="0.5" />
-    <label for="feedbackSlider" id="feedbackLabel">0.5</label>
+      <p>Feedback Gain</p>
+      <input
+        id="feedbackSlider"
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value="0.5" />
+      <label for="feedbackSlider" id="feedbackLabel">0.5</label>
+    </div>
     <div id="keyboard"></div>
   </body>
 </html>
