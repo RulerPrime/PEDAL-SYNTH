@@ -1,41 +1,21 @@
 // effect.js
+export function initDelay(audioContext) {
+  const delay = audioContext.createDelay();
+  delay.delayTime.value = 0.5; // Default delay time (500ms)
 
-let delayNode, feedbackGainNode, filterNode;
+  const feedbackGain = audioContext.createGain();
+  feedbackGain.gain.value = 0.5; // Default feedback level
 
-export function initEffects(audioContext) {
-  delayNode = audioContext.createDelay();
-  feedbackGainNode = audioContext.createGain();
-  filterNode = audioContext.createBiquadFilter();
+  delay.connect(feedbackGain);
+  feedbackGain.connect(delay);
 
-  delayNode.delayTime.value = 0.3;
-  feedbackGainNode.gain.value = 0.3;
-  filterNode.type = "lowpass";
-  filterNode.frequency.value = 10000;
-
-  delayNode.connect(feedbackGainNode);
-  feedbackGainNode.connect(delayNode);
-
-  delayNode.connect(filterNode);
-  return filterNode;
+  return { delay, feedbackGain };
 }
 
-export function setDelayTime(time) {
-  if (delayNode) {
-    delayNode.delayTime.setValueAtTime(time, delayNode.context.currentTime);
-  }
+export function setDelayTime(delay, time) {
+  delay.delayTime.setValueAtTime(time, delay.context.currentTime);
 }
 
-export function setFeedbackGain(gain) {
-  if (feedbackGainNode) {
-    feedbackGainNode.gain.setValueAtTime(
-      gain,
-      feedbackGainNode.context.currentTime
-    );
-  }
-}
-
-export function setFilterCutoff(freq) {
-  if (filterNode) {
-    filterNode.frequency.setValueAtTime(freq, filterNode.context.currentTime);
-  }
+export function setFeedbackGain(feedbackGain, gainValue) {
+  feedbackGain.gain.setValueAtTime(gainValue, feedbackGain.context.currentTime);
 }

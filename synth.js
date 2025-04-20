@@ -1,3 +1,5 @@
+import { initDelay, setDelayTime, setFeedbackGain } from "./effect.js";
+
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const masterGain = audioContext.createGain();
 masterGain.connect(audioContext.destination);
@@ -33,6 +35,10 @@ const masterGainControl = document.getElementById("masterFader");
 const masterGainValue = document.getElementById("fadeLabel");
 const noteDisplay = document.getElementById("noteDisplay");
 const keyboardContainer = document.getElementById("keyboard");
+
+// Initialize delay effect
+const { delay, feedbackGain } = initDelay(audioContext);
+masterGain.connect(delay); // Connect master gain to delay
 
 masterGain.gain.setValueAtTime(
   dbToGain(parseFloat(masterGainControl.value)),
@@ -79,6 +85,24 @@ for (const [key, midi] of Object.entries(noteMap)) {
   keyboardContainer.appendChild(div);
 }
 
+// Handle Delay Time Slider
+const delayTimeSlider = document.getElementById("delayTimeSlider");
+const delayTimeLabel = document.getElementById("delayTimeLabel");
+delayTimeSlider.addEventListener("input", (event) => {
+  const delayTime = parseFloat(event.target.value);
+  setDelayTime(delay, delayTime);
+  delayTimeLabel.textContent = `${delayTime.toFixed(2)}s`; // Update the label with the current value
+});
+
+// Handle Feedback Gain Slider
+const feedbackSlider = document.getElementById("feedbackSlider");
+const feedbackLabel = document.getElementById("feedbackLabel");
+feedbackSlider.addEventListener("input", (event) => {
+  const feedbackValue = parseFloat(event.target.value);
+  setFeedbackGain(feedbackGain, feedbackValue);
+  feedbackLabel.textContent = `${feedbackValue.toFixed(2)}`; // Update the label with the current value
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.target.tagName.toLowerCase() === "select") return;
 
@@ -95,7 +119,8 @@ document.addEventListener("keydown", (event) => {
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
   oscillator.connect(ampEnv);
-  ampEnv.connect(masterGain);
+  ampEnv.connect(feedbackGain); // Connect to feedback gain before going to delay
+  feedbackGain.connect(masterGain); // Connect feedback gain to master gain
 
   const now = audioContext.currentTime;
   const attack = 0.02;

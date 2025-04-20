@@ -101,7 +101,25 @@
       </p>
       <p id="noteDisplay">Currently Playing: None</p>
     </div>
+    <p>Delay Time</p>
+    <input
+      id="delayTimeSlider"
+      type="range"
+      min="0"
+      max="2"
+      step="0.01"
+      value="0.5" />
+    <label for="delayTimeSlider" id="delayTimeLabel">0.5s</label>
 
+    <p>Feedback Gain</p>
+    <input
+      id="feedbackSlider"
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      value="0.5" />
+    <label for="feedbackSlider" id="feedbackLabel">0.5</label>
     <div id="keyboard"></div>
   </body>
 </html>
