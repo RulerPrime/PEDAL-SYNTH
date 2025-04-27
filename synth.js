@@ -148,6 +148,24 @@ overdriveGainSlider.addEventListener("input", (event) => {
   setOverdriveGain(overdrive, gainValue);
   overdriveGainLabel.textContent = `${gainValue}`; // Update the label with the current value
 });
+// Move the sliders to 0
+overdriveGainSlider.value = 0;
+delayTimeSlider.value = 0;
+reverbMixSlider.value = 0;
+feedbackSlider.value = 0.35;
+
+// Update the labels too
+overdriveGainLabel.textContent = "0"; // Overdrive Gain
+delayTimeLabel.textContent = "0.00s"; // Delay Time
+reverbMixLabel.textContent = "0% Wet"; // Reverb Wet/Dry
+feedbackLabel.textContent = ".35"; //feedback gain
+
+// set the audio effects to 0
+setDelayTime(delay, 0);
+setOverdriveGain(overdrive, 0);
+setReverbWetDry(wetGain, dryGain, 0);
+setFeedbackGain(feedbackGain, 0.35);
+
 document.addEventListener("keydown", (event) => {
   if (event.target.tagName.toLowerCase() === "select") return;
 
@@ -208,7 +226,6 @@ document.addEventListener("keyup", (event) => {
     ampEnv.gain.exponentialRampToValueAtTime(0.0001, now + release);
 
     oscillator.stop(now + release + 0.05);
-    oscillator.disconnect();
     delete activeVoices[key];
   }
 
