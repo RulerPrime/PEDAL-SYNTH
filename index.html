@@ -9,8 +9,8 @@
     <style>
       #effectsPanel {
         position: fixed;
-        left: 20px;
-        top: 20px;
+        left: 40px;
+        top: 100px;
         background: rgba(0, 0, 0, 0.2);
         padding: 12px;
         border-radius: 8px;
@@ -87,13 +87,16 @@
         background-color: #4fc3f7 !important;
       }
       #controls {
-        margin-top: 150px; /* or whatever looks good */
+        margin-top: 200px; /* or whatever looks good */
       }
       body {
         background-image: url("Pedal fm Background.jpg");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+      }
+      #keyControls {
+        position: center;
       }
     </style>
   </head>
@@ -116,7 +119,8 @@
         <option value="triangle">Triangle</option>
         <option value="sawtooth">Sawtooth</option>
       </select>
-
+    </div>
+    <div id="keyControls">
       <p>
         Use your keyboard to play notes! (a, w, s, e, d, f, t, g, y, h, u, j,
         k...)
